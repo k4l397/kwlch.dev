@@ -1,5 +1,8 @@
-module.exports = () => ({
-  dir: {
-    input: "pages",
-  },
-});
+module.exports = (config) => {
+  config.addPassthroughCopy("CNAME");
+  return {
+    dir: {
+      input: "pages",
+    },
+  };
+};
