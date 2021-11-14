@@ -15,5 +15,5 @@ git --work-tree $BUILD_DIR commit -m 'deploy to gh-pages'
 git push origin HEAD:gh-pages --force
 git checkout -f main
 
-echo "Deployed to https://kwlch.dev!"
+echo "Deployed to https://kwlch.dev !"
 exit 0
