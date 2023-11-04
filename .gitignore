@@ -1,5 +1,7 @@
 node_modules/
 _site
+dist
+.parcel-cache
 .pnp.*
 .yarn/*
 !.yarn/patches
