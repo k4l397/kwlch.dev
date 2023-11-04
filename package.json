@@ -1,7 +1,7 @@
 {
   "name": "kwlch.dev",
   "scripts": {
-    "build": "rm -rf _site/ && eleventy && parcel build _site/**/*.html",
+    "build": "rm -rf _site/ && eleventy && parcel build _site/**/*.html && cp CNAME dist",
     "start": "eleventy --serve",
     "deploy": "yarn build && ./deploy.sh"
   },
