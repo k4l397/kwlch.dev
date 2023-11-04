@@ -1,11 +1,16 @@
 {
   "name": "kwlch.dev",
   "scripts": {
-    "build": "rm -rf _site/ && npx @11ty/eleventy",
-    "start": "npx @11ty/eleventy --serve",
-    "deploy": "npm run build && ./deploy.sh"
+    "build": "rm -rf _site/ && eleventy",
+    "start": "eleventy --serve",
+    "deploy": "yarn build && ./deploy.sh"
   },
   "devDependencies": {
-    "@11ty/eleventy": "^0.12.1"
+    "@11ty/eleventy": "^2.0.1",
+    "prettier": "^3.0.3"
+  },
+  "packageManager": "yarn@4.0.1",
+  "volta": {
+    "node": "21.1.0"
   }
 }
