@@ -1,9 +1,30 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self' 'sha256-qfCdwJ3iVfiWCx7+NCqVP/x1MuthvXGO8bXUM2AJhj8='"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" type="text/css" href="/css/main.css" />
+    <style>
+      @font-face {
+        font-family: "Quattrocento";
+        src: url(/fonts/Quattrocento-Regular.ttf) format("truetype");
+        font-weight: normal;
+      }
+      @font-face {
+        font-family: "Fanwood Text";
+        src: url(/fonts/FanwoodText-Regular.ttf) format("truetype");
+        font-weight: normal;
+      }
+      body {
+        font-family: "Fanwood Text", serif;
+      }
+      h1 {
+        font-family: "Quattrocento", serif;
+      }
+    </style>
     <title>kwlch.dev</title>
   </head>
   <body>

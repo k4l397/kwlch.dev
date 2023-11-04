@@ -65,6 +65,25 @@ body {
   background-color: var(--background);
   color: var(--text-primary);
 }
+header::before {
+  content: "";
+  top: 0;
+  display: block;
+  height: 10px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    hotpink 12.5%,
+    red 0 25%,
+    orange 0 37.5%,
+    yellow 0 50%,
+    green 0 62.5%,
+    darkturquoise 0 75%,
+    blue 0 87.5%,
+    indigo 0
+  );
+  position: absolute;
+}
 
 h1,
 h2,
