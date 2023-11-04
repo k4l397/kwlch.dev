@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-BUILD_DIR=_site
+BUILD_DIR=dist
 
 if [[ `git status --porcelain --untracked-files=no` ]]; then
   echo "Uncommitted changes - commit changes before deploying."
