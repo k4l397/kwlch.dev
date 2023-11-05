@@ -1,5 +1,5 @@
 :root {
-  color-scheme: light;
+  color-scheme: light dark;
   --standout: #4c70ff;
   --text-emphasis: #404040;
   --text-primary: #606060;
@@ -7,6 +7,17 @@
   --foreground: #d7fdff;
   --hover: #ffffff;
   --icon-size: 3.2rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --standout: #4c70ff;
+    --text-emphasis: #e1e1e1;
+    --text-primary: #606060;
+    --background: #313131;
+    --foreground: #07191a;
+    --hover: #ffffff;
+    --icon-size: 3.2rem;
+  }
 }
 
 /* CSS Reset - based on https://www.joshwcomeau.com/css/custom-css-reset/ */
