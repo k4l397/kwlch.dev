@@ -152,8 +152,8 @@ h1 span {
   inset: 0;
   position: absolute;
 }
-.twitter {
-  --mask: url(/img/x-twitter.svg);
+.bsky {
+  --mask: url(/img/bluesky.svg);
 }
 .email {
   --mask: url(/img/envelope-solid.svg);
