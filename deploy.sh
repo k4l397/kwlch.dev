@@ -8,7 +8,7 @@ if [[ `git status --porcelain --untracked-files=no` ]]; then
   exit 1
 fi
 
-git branch -D gh-pages
+git branch -D gh-pages 2>/dev/null || true
 git checkout --orphan gh-pages
 git --work-tree $BUILD_DIR add --all
 git --work-tree $BUILD_DIR commit -m 'deploy to gh-pages'
