@@ -3,11 +3,11 @@ title: How to keep GitLab CI manageable in a large monorepo
 date: 2026-03-27
 ---
 
-Over the past few years I've worked extensively on a large monorepo hosted on GitLab. Over that time I've hit some real issues that sometimes made the experience painful. Pipelines in the monorepo I worked on at points have been a complex web that no human could reason about or safely change with confidence.
+Over the past few years I've worked extensively on a large monorepo hosted on GitLab, and at points the experience has been genuinely painful. Pipelines have been a complex web that no human could reason about or safely change with confidence.
 
 Benoit Couetil's [GitLab CI: 10+ Best Practices to Avoid Widespread Anti-Patterns](https://dev.to/zenika/gitlab-ci-10-best-practices-to-avoid-widespread-anti-patterns-2mb5) is the best single article I've found on GitLab CI. It shaped a lot of how I think about pipeline design, and I agree with nearly all of it. If you haven't read it, go do that first!
 
-I want to revisit two of his recommendations through the lens of working in a large monorepo. On child pipelines, I've landed in a different place. And while I mostly agree with his point on abstracting duplicated code, I want to push it further and make a case for [CI/CD components](https://docs.gitlab.com/ci/components/) as the better tool for sharing configuration now that they've matured.
+I want to revisit two of his recommendations through the lens of working in a large monorepo. On child pipelines, I've landed in a different place. On abstracting duplicated code, I mostly agree with his point — but I want to push it further and make a case for [CI/CD components](https://docs.gitlab.com/ci/components/) as the better tool for sharing configuration now that they've matured.
 
 ## Child pipelines are worth it
 
@@ -23,17 +23,17 @@ In the above example, a test failure in one service has stopped the entire pipel
 
 The natural reaction is to reach for `needs`. Wire up explicit dependencies between jobs so each service's build feeds into its own test, which feeds into its own deploy. Unrelated services can progress independently.
 
-This helps with speed and isolation. But as you add services, the dependency graph grows fast.
+This helps with speed and isolation. But as you add services, the dependency graph grows fast — and with it, the mental overhead of understanding what depends on what.
 
 {% darkLightImg "/img/blog/gitlab/needs", "svg", "The same four services, now wired with explicit needs dependencies instead of stages. Arrows connect each job to its dependencies, creating a dense web of relationships — particularly around shared integration_test and api_tests jobs, which fan out to multiple deploy_to_prod jobs. The graph is difficult to follow at a glance." %}
 
 Every arrow here is a `needs` relationship. Imagine you're the person adding a new service, or introducing a dependency between two existing ones. You need to understand this entire graph to be confident you haven't missed something. A missed dependency means a deployment could run ahead of a test that should have gated it.
 
-This is the stageless pipeline trap, and I've found it out firsthand. Here we've traded stage-based coupling for cognitive overload.
+This is the stageless pipeline trap, and I've fallen into it firsthand — we'd traded stage-based coupling for cognitive overload.
 
 ### Isolation at the pipeline level
 
-What we really want is to have the simplicity of stages but the isolation of our "needs" graph. With child pipelines, each service (or group of related services) gets its own isolated pipeline with its own stages. A failure in one child pipeline doesn't affect another.
+What we really want is the simplicity of stages but the isolation of our "needs" graph. With child pipelines, each service (or group of related services) gets its own isolated pipeline with its own stages. A failure in one child pipeline doesn't affect another.
 
 {% darkLightImg "/img/blog/gitlab/child-pipeline", "svg", "The four services split into two child pipelines. Service A is in its own pipeline, outlined with a red dashed border — its test has failed and downstream jobs are blocked. Services B, C, and D are in a separate pipeline, outlined with a green dashed border — all their jobs have completed successfully through to production deployment, unaffected by service A's failure." %}
 
@@ -41,13 +41,13 @@ Each child pipeline is small. No one needs to hold a large dependency graph in t
 
 The parent pipeline's job is simple: trigger the relevant children based on which files changed. We push most jobs down to the children.
 
-Yes, the UI is still frustrating. Waiting for a child pipeline to trigger is suboptimal — it'd be good if it could load from the outset when the parent is created. The stages of the pipeline no longer appear inline either. GitLab has improved things, but it's still clunkier than I'd like. It's an inconvenience, but the trade-off to have isolation is 100% worth it.
+Yes, the UI is still frustrating — waiting for a child pipeline to trigger, not seeing stages inline. It'd be nice if children loaded from the outset when the parent is created. GitLab has improved things, but it's still clunkier than I'd like. It's an inconvenience, but the trade-off for isolation is 100% worth it.
 
 ## Stop nesting `extends`
 
-In the name of DRY code, some end up nesting extends several layers deep, and at that point they obfuscate what a job is actually doing. You end up grepping across four files, trying to mentally merge YAML that was split apart to avoid repetition. And because extends let you override any field at any level, there's no way to constrain how someone uses a shared template. People override things they shouldn't, and the resulting behaviour is surprising.
+In the name of DRY code, some end up nesting extends several layers deep, obfuscating what a job is actually doing. You end up grepping across four files, trying to mentally merge YAML that was split apart to avoid repetition. And because extends let you override any field at any level, there's no way to constrain how someone uses a shared template. People override things they shouldn't, and the resulting behaviour is surprising.
 
-To illustrate this, I found a particularly incriminating example from a repo I've worked on:
+I found a particularly incriminating example from a repo I've worked on:
 
 ```yaml
 service_a_deploy_to_prod:
@@ -68,7 +68,7 @@ service_a_deploy_to_prod:
       changes: !reference [.deploy_service_a_globs, changes]
 ```
 
-To understand this job, you need to read `.deploy_to_prod` (itself a meaningless hop to add a level indirection):
+To understand this job, you need to read `.deploy_to_prod` (itself a meaningless hop to add a level of indirection):
 
 ```yaml
 .deploy_to_prod:
@@ -114,7 +114,7 @@ Which extends `.deploy_k8s`:
     GIT_STRATEGY: clone
 ```
 
-Four files. Three levels of inheritance. Any field can be overridden at any level. Good luck reviewing a change to `.deploy_k8s` and being confident about what it affects.
+That's four files. Three levels of inheritance. Any field can be overridden at any level. Good luck reviewing a change to `.deploy_k8s` and being confident about what it affects.
 
 ## Use CI/CD components instead
 
@@ -186,4 +186,4 @@ Components only went GA in GitLab 17.0, and they're still maturing. But they've 
 
 None of this is settled wisdom. GitLab keeps shipping changes and improvements — I'm particularly excited to see where [Functions](https://docs.gitlab.com/ci/functions/) go.
 
-If your monorepo has grown to the point where a failure in one service blocks another, or where understanding a single job means mentally reconstructing through a chain of extends clauses, these two changes that I've discussed should make a real difference to you.
+If your monorepo has grown to the point where a failure in one service blocks another, or where understanding a single job means mentally reconstructing through a chain of extends clauses, these two changes should make a real difference.
