@@ -40,11 +40,9 @@
   <body>
     <header id="site-header">
       <h1>{{ title }}</h1>
-      <time datetime="{{ date | date: '%Y-%m-%d' }}">{{ date | date: '%B %d, %Y' }}</time>
+      <time datetime="{{ date | date: '%Y-%m-%d' }}">{{ date | date: '%d %B %Y' }}</time>
     </header>
-    <article class="blog-post">
-      {{ content }}
-    </article>
+    <article class="blog-post">{{ content }}</article>
     <nav class="blog-nav">
       <a href="/blog/">&larr; back to blog</a>
     </nav>
