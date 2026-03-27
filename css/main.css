@@ -2,7 +2,7 @@
   color-scheme: light dark;
   --standout: #4c70ff;
   --text-emphasis: #404040;
-  --text-primary: #606060;
+  --text-primary: #3d3d3d;
   --background: #e3ecf2;
   --foreground: #d7fdff;
   --hover: #ffffff;
@@ -12,7 +12,7 @@
   :root {
     --standout: #4c70ff;
     --text-emphasis: #e1e1e1;
-    --text-primary: #606060;
+    --text-primary: #c0c0c0;
     --background: #313131;
     --foreground: #07191a;
     --hover: #ffffff;
@@ -177,4 +177,105 @@ h1 span {
   padding: 2rem 0;
   border-radius: 1rem;
   justify-content: space-around;
+}
+
+/* Blog link on homepage */
+.blog-link {
+  margin-top: 2rem;
+  color: var(--standout);
+  text-decoration: none;
+  font-size: 2rem;
+}
+.blog-link:hover {
+  color: var(--hover);
+}
+
+/* Blog listing */
+.blog-list {
+  margin-top: 2rem;
+}
+.blog-entry {
+  display: block;
+  text-decoration: none;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--foreground);
+}
+.blog-entry h2 {
+  font-size: 2.2rem;
+  color: var(--standout);
+}
+.blog-entry:hover h2 {
+  color: var(--hover);
+}
+.blog-entry time {
+  font-size: 1.6rem;
+  color: var(--text-primary);
+}
+
+/* Blog post */
+.blog-post {
+  margin-top: 3rem;
+  line-height: 1.8;
+}
+.blog-post p {
+  margin-bottom: 1.5rem;
+}
+.blog-post h2 {
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+}
+.blog-post h3 {
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+.blog-post a {
+  color: var(--standout);
+}
+.blog-post a:hover {
+  color: var(--hover);
+}
+.blog-post code {
+  background-color: var(--foreground);
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.3rem;
+  font-size: 1.6rem;
+}
+.blog-post pre {
+  background-color: var(--foreground);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+}
+.blog-post pre code {
+  background: none;
+  padding: 0;
+}
+.blog-post picture {
+  margin-bottom: 2rem;
+}
+.blog-post ul,
+.blog-post ol {
+  margin-bottom: 1.5rem;
+  padding-left: 2rem;
+}
+.blog-post blockquote {
+  border-left: 3px solid var(--standout);
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+}
+
+/* Blog navigation */
+.blog-nav {
+  margin-top: 3rem;
+  padding-top: 2rem;
+}
+.blog-nav a {
+  color: var(--standout);
+  text-decoration: none;
+  font-size: 1.8rem;
+}
+.blog-nav a:hover {
+  color: var(--hover);
 }

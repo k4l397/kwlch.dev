@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="/css/main.css" />
+    <link rel="icon" href="/favicon.ico" />
+    <style>
+      @font-face {
+        font-family: "Quattrocento";
+        src: url(/fonts/Quattrocento-Regular.ttf) format("truetype");
+        font-weight: normal;
+      }
+      @font-face {
+        font-family: "Quattrocento";
+        src: url(/fonts/Quattrocento-Bold.ttf) format("truetype");
+        font-weight: bold;
+      }
+      @font-face {
+        font-family: "Fanwood Text";
+        src: url(/fonts/FanwoodText-Regular.ttf) format("truetype");
+        font-weight: normal;
+      }
+      @font-face {
+        font-family: "Fanwood Text";
+        src: url(/fonts/FanwoodText-Italic.ttf) format("truetype");
+        font-style: italic;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: "Quattrocento", serif;
+      }
+    </style>
+    <title>{{ title }} - kwlch.dev</title>
+  </head>
+  <body>
+    <header id="site-header">
+      <h1>{{ title }}</h1>
+      <time datetime="{{ date | date: '%Y-%m-%d' }}">{{ date | date: '%B %d, %Y' }}</time>
+    </header>
+    <article class="blog-post">
+      {{ content }}
+    </article>
+    <nav class="blog-nav">
+      <a href="/blog/">&larr; back to blog</a>
+    </nav>
+  </body>
+</html>
