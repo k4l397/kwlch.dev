@@ -40,7 +40,7 @@ permalink: /blog/
       {% for post in sorted_posts %}
       <a href="{{ post.url }}" class="blog-entry">
         <h2>{{ post.data.title }}</h2>
-        <time datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: '%B %d, %Y' }}</time>
+        <time datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: '%d %B %Y' }}</time>
       </a>
       {% endfor %}
       {% if collections.post.size == 0 %}
