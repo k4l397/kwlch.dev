@@ -1,0 +1,24 @@
+---
+permalink: /feed.xml
+eleventyExcludeFromCollections: true
+---
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>kwlch.dev</title>
+  <link href="https://kwlch.dev/feed.xml" rel="self"/>
+  <link href="https://kwlch.dev/"/>
+  <updated>{{ collections.post | getNewestCollectionItemDate | dateToRfc3339 }}</updated>
+  <id>https://kwlch.dev/</id>
+  <author>
+    <name>Kyle Welch</name>
+  </author>
+  {%- for post in collections.post | reverse %}
+  <entry>
+    <title>{{ post.data.title }}</title>
+    <link href="https://kwlch.dev{{ post.url }}"/>
+    <id>https://kwlch.dev{{ post.url }}</id>
+    <updated>{{ post.date | dateToRfc3339 }}</updated>
+    <content type="html">{{ post.content | htmlToAbsoluteUrls("https://kwlch.dev") }}</content>
+  </entry>
+  {%- endfor %}
+</feed>

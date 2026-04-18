@@ -59,6 +59,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@11ty/eleventy-plugin-rss@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@11ty/eleventy-plugin-rss@npm:3.0.0"
+  dependencies:
+    "@11ty/eleventy-utils": "npm:^2.0.7"
+    "@11ty/posthtml-urls": "npm:^1.0.2"
+    debug: "npm:^4.4.3"
+    posthtml: "npm:^0.16.7"
+  checksum: 10/99ad020b908ce9847c0a2c4c887bff88a4e1357ee608b193a5375710b7f18d6a5149194581ab648e6f478647d42fcbd7623e2d1fb5fbe4b1d1a995b18990cb1d
+  languageName: node
+  linkType: hard
+
 "@11ty/eleventy-upgrade-help@npm:3":
   version: 3.0.1
   resolution: "@11ty/eleventy-upgrade-help@npm:3.0.1"
@@ -78,6 +90,13 @@ __metadata:
   dependencies:
     normalize-path: "npm:^3.0.0"
   checksum: 10/b81647a4817889c4842c7b97417de1cbdf17b1e68dd0ab34e6f040068b206f0b46688df52d7a5ed205be6a264f55500aae5178616388ca957c93e0a838585b0d
+  languageName: node
+  linkType: hard
+
+"@11ty/eleventy-utils@npm:^2.0.7":
+  version: 2.0.7
+  resolution: "@11ty/eleventy-utils@npm:2.0.7"
+  checksum: 10/f31d91c27c6957c0373ba12e15805c1d9572d58a487de0d38cf6b364cb80d13bafd1d83c7a1d2a75b541f48ab2a8430353b518bc237f71a737eda145479aeef1
   languageName: node
   linkType: hard
 
@@ -146,6 +165,18 @@ __metadata:
     object.entries: "npm:^1.1.7"
     parse-srcset: "npm:^1.0.2"
   checksum: 10/5c2972d1201c846d7037206916927e14b42ec5b90da1f3293228b3128e242d4a3dba45123fe74de46b3c7b7d0947ee78446047da80dd8b5459db91131c1ccd2a
+  languageName: node
+  linkType: hard
+
+"@11ty/posthtml-urls@npm:^1.0.2":
+  version: 1.0.3
+  resolution: "@11ty/posthtml-urls@npm:1.0.3"
+  dependencies:
+    evaluate-value: "npm:^2.0.0"
+    http-equiv-refresh: "npm:^2.0.1"
+    list-to-array: "npm:^1.1.0"
+    parse-srcset: "npm:^1.0.2"
+  checksum: 10/fdfe5afa2c8fea941da9c3525bf296f693e087094c63bbd6a16e098a5bdc4791bd26604208229745b4d6654652b40171908a90da97ae2b8150eac1c22804cdff
   languageName: node
   linkType: hard
 
@@ -1954,6 +1985,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"debug@npm:^4.4.3":
+  version: 4.4.3
+  resolution: "debug@npm:4.4.3"
+  dependencies:
+    ms: "npm:^2.1.3"
+  peerDependenciesMeta:
+    supports-color:
+      optional: true
+  checksum: 10/9ada3434ea2993800bd9a1e320bd4aa7af69659fb51cca685d390949434bc0a8873c21ed7c9b852af6f2455a55c6d050aa3937d52b3c69f796dab666f762acad
+  languageName: node
+  linkType: hard
+
 "define-data-property@npm:^1.0.1, define-data-property@npm:^1.1.4":
   version: 1.1.4
   resolution: "define-data-property@npm:1.1.4"
@@ -2972,6 +3015,7 @@ __metadata:
   resolution: "kwlch.dev@workspace:."
   dependencies:
     "@11ty/eleventy": "npm:3"
+    "@11ty/eleventy-plugin-rss": "npm:^3.0.0"
     "@11ty/eleventy-upgrade-help": "npm:3"
     "@parcel/core": "npm:^2.13.0"
     parcel: "npm:^2.13.0"
@@ -3899,6 +3943,16 @@ __metadata:
     posthtml-parser: "npm:^0.11.0"
     posthtml-render: "npm:^3.0.0"
   checksum: 10/e1ce9cda9b9fea0e1ddaccf13c945ca7e1bae2c6f54d34b2d0c9ed5b4b55d456684732257fc85113291807e99fcea585ad959acedca2de94d0744a84e15b31fb
+  languageName: node
+  linkType: hard
+
+"posthtml@npm:^0.16.7":
+  version: 0.16.7
+  resolution: "posthtml@npm:0.16.7"
+  dependencies:
+    posthtml-parser: "npm:^0.11.0"
+    posthtml-render: "npm:^3.0.0"
+  checksum: 10/be101a9515a3cb20c61c0492d6d784e18d174e75b326844abd6692f850605572725a2e1c521db38755d1ccbd81f910101dd92b8a59c8ca36c3c4dc8141874496
   languageName: node
   linkType: hard
 

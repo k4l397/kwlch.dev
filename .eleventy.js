@@ -1,4 +1,8 @@
-module.exports = (config) => {
+import rssPlugin from "@11ty/eleventy-plugin-rss";
+
+export default (config) => {
+  config.addPlugin(rssPlugin);
+
   config.addPassthroughCopy("css");
   config.addPassthroughCopy("img");
   config.addPassthroughCopy("fonts");
