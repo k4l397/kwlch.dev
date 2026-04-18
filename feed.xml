@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>kwlch.dev</title>
+  <link href="https://kwlch.dev/feed.xml" rel="self"/>
+  <link href="https://kwlch.dev/"/>
+  <updated>2026-04-18T00:00:00Z</updated>
+  <id>https://kwlch.dev/</id>
+  <author>
+    <name>Kyle Welch</name>
+  </author>
+  <entry>
+    <title>Type-Safe Pagination in Python with Protocols</title>
+    <link href="https://kwlch.dev/blog/python-protocols/"/>
+    <id>https://kwlch.dev/blog/python-protocols/</id>
+    <updated>2026-04-18T00:00:00Z</updated>
+    <content type="html">&lt;p&gt;I wanted a generic pagination function for a GraphQL API, but the generated types wouldn&#39;t let me write one. I was using ariadne-codegen to generate typed Python stubs from a GraphQL schema — the types are correct, but you can&#39;t fully control their shape.&lt;/p&gt;
+&lt;p&gt;Each endpoint returned a discriminated union — a type that could be one of several unrelated types. For one endpoint, that looked like this:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;type EndpointAResult = EndpointASuccessItems | EndpointAAuthorizationError | EndpointANotFoundError
+
+@dataclass
+class EndpointASuccessItems:
+    items: list[EndpointASuccessType]
+    page_info: EndpointAPageInfo
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The challenge was that each error type was a distinct class with no common base class. Without a shared parent, there&#39;s no obvious way to write an &lt;code&gt;isinstance&lt;/code&gt; check in a generic function that a type checker can use to narrow the type.&lt;/p&gt;
+&lt;p&gt;This is the problem structural subtyping solves. Since Python 3.8, &lt;a href=&quot;https://peps.python.org/pep-0544/&quot;&gt;Protocols&lt;/a&gt; let you define a type by what it has, not what it inherits from. For me, having spent most time writing Go, this is a familiar concept very much akin to interfaces.&lt;/p&gt;
+&lt;p&gt;All the generated error types shared the same fields, but had no common parent:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;@dataclass
+class EndpointAAuthorizationError:
+    error_code: str
+    error_message: str
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And similarly, every paged response had the same pagination structure:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;@dataclass
+class EndpointAPageInfo:
+    has_next_page: bool
+    end_cursor: str | None
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So I defined Protocols that captured these shared shapes:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;@runtime_checkable
+class ErrorResponse(Protocol):
+    @property
+    def error_code(self) -&amp;gt; str: ...
+    @property
+    def error_message(self) -&amp;gt; str: ...
+
+class PageInfo(Protocol):
+    @property
+    def has_next_page(self) -&amp;gt; bool: ...
+    @property
+    def end_cursor(self) -&amp;gt; str | None: ...
+
+class PagedResult[T](Protocol):
+    @property
+    def page_info(self) -&amp;gt; PageInfo: ...
+    @property
+    def items(self) -&amp;gt; list[T]: ...
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;By default, Protocols are a purely static concept — your type checker understands them, but &lt;code&gt;isinstance&lt;/code&gt; doesn&#39;t. Adding &lt;code&gt;@runtime_checkable&lt;/code&gt; lets you use &lt;code&gt;isinstance(result, ErrorResponse)&lt;/code&gt; at runtime, which is what makes narrowing possible.&lt;/p&gt;
+&lt;p&gt;With those Protocols in place, the generic pagination function is now possible:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;_DEFAULT_PAGE_SIZE = 100
+
+def paginate[T](
+    fetch: Callable[[int, str | None], PagedResult[T] | ErrorResponse],
+    page_size: int = _DEFAULT_PAGE_SIZE,
+) -&amp;gt; Iterator[T]:
+    after: str | None = None
+    while True:
+        result = fetch(page_size, after)
+        if isinstance(result, ErrorResponse):
+            raise APIError(f&amp;quot;Query failed [{result.error_code}]: {result.error_message}&amp;quot;)
+        yield from result.items
+        if not result.page_info.has_next_page:
+            break
+        after = result.page_info.end_cursor
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This handles pagination for any endpoint whose response matches the Protocol and the type checker correctly narrows &lt;code&gt;result&lt;/code&gt; to &lt;code&gt;PagedResult[T]&lt;/code&gt; after the &lt;code&gt;isinstance&lt;/code&gt; check. Aside from being a useful static safety check, it also gives us useful autocompletion in our editor.&lt;/p&gt;
+&lt;p&gt;Calling it is straightforward:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;for item in paginate(lambda first, after: client.get_items(first=first, after=after)):
+    print(item)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Python&#39;s type system still has gaps that are hard to ignore if you&#39;ve spent time with TypeScript. Protocols are a potentially underused feature. Any time you&#39;re working with codegen output, third-party libraries, or multiple classes that happen to share a structure, Protocols let you write generic, type-safe code without reaching for inheritance or wrapper classes.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>How to keep GitLab CI manageable in a large monorepo</title>
+    <link href="https://kwlch.dev/blog/gitlab/"/>
+    <id>https://kwlch.dev/blog/gitlab/</id>
+    <updated>2026-03-27T00:00:00Z</updated>
+    <content type="html">&lt;p&gt;Over the past few years I&#39;ve worked extensively on a large monorepo hosted on GitLab, and at points the experience has been genuinely painful. Pipelines have been a complex web that no human could reason about or safely change with confidence.&lt;/p&gt;
+&lt;p&gt;Benoit Couetil&#39;s &lt;a href=&quot;https://dev.to/zenika/gitlab-ci-10-best-practices-to-avoid-widespread-anti-patterns-2mb5&quot;&gt;GitLab CI: 10+ Best Practices to Avoid Widespread Anti-Patterns&lt;/a&gt; is the best single article I&#39;ve found on GitLab CI. It shaped a lot of how I think about pipeline design, and I agree with nearly all of it. If you haven&#39;t read it, go do that first!&lt;/p&gt;
+&lt;p&gt;I want to revisit two of his recommendations through the lens of working in a large monorepo. On child pipelines, I&#39;ve landed in a different place. On abstracting duplicated code, I mostly agree with his point — but I want to push it further and make a case for &lt;a href=&quot;https://docs.gitlab.com/ci/components/&quot;&gt;CI/CD components&lt;/a&gt; as the better tool for sharing configuration now that they&#39;ve matured.&lt;/p&gt;
+&lt;h2&gt;Child pipelines are worth it&lt;/h2&gt;
+&lt;p&gt;Couetil recommends avoiding child pipelines. His concerns — clunky UI, limited artifact sharing, added indirection — were valid when he wrote the article, and some of them still are. But in a monorepo with many services, I think child pipelines are essential.&lt;/p&gt;
+&lt;p&gt;Imagine a monorepo with several services, each with jobs flowing through &lt;code&gt;build → test → deploy_non_prod → integration_tests → deploy_to_prod&lt;/code&gt;. In a single flat pipeline, all of those jobs share stages. If a test fails in one service, every other service is blocked, even if they&#39;re completely unrelated.&lt;/p&gt;
+&lt;picture&gt;
+      &lt;source srcset=&quot;https://kwlch.dev/img/blog/gitlab/monolith-dark.svg&quot; media=&quot;(prefers-color-scheme: dark)&quot; /&gt;
+      &lt;img src=&quot;https://kwlch.dev/img/blog/gitlab/monolith-light.svg&quot; alt=&quot;A GitLab pipeline with four services sharing five stages: build, test, deploy_non_prod, integration_tests, and deploy_to_prod. Service A&#39;s test job has failed. All downstream jobs across all four services are blocked and shown as not started, even though the other three services&#39; build and test jobs passed successfully.&quot; /&gt;
+    &lt;/picture&gt;
+&lt;p&gt;In the above example, a test failure in one service has stopped the entire pipeline. The other three services built successfully and their tests would pass, but they can&#39;t progress because they&#39;re stuck behind a failure they have nothing to do with. You&#39;ve coupled the release of unrelated services to each other&#39;s pipeline health.&lt;/p&gt;
+&lt;h3&gt;The &lt;code&gt;needs&lt;/code&gt; trap&lt;/h3&gt;
+&lt;p&gt;The natural reaction is to reach for &lt;code&gt;needs&lt;/code&gt;. Wire up explicit dependencies between jobs so each service&#39;s build feeds into its own test, which feeds into its own deploy. Unrelated services can progress independently.&lt;/p&gt;
+&lt;p&gt;This helps with speed and isolation. But as you add services, the dependency graph grows fast — and with it, the mental overhead of understanding what depends on what.&lt;/p&gt;
+&lt;picture&gt;
+      &lt;source srcset=&quot;https://kwlch.dev/img/blog/gitlab/needs-dark.svg&quot; media=&quot;(prefers-color-scheme: dark)&quot; /&gt;
+      &lt;img src=&quot;https://kwlch.dev/img/blog/gitlab/needs-light.svg&quot; alt=&quot;The same four services, now wired with explicit needs dependencies instead of stages. Arrows connect each job to its dependencies, creating a dense web of relationships — particularly around shared integration_test and api_tests jobs, which fan out to multiple deploy_to_prod jobs. The graph is difficult to follow at a glance.&quot; /&gt;
+    &lt;/picture&gt;
+&lt;p&gt;Every arrow here is a &lt;code&gt;needs&lt;/code&gt; relationship. Imagine you&#39;re the person adding a new service, or introducing a dependency between two existing ones. You need to understand this entire graph to be confident you haven&#39;t missed something. A missed dependency means a deployment could run ahead of a test that should have gated it.&lt;/p&gt;
+&lt;p&gt;This is the stageless pipeline trap, and I&#39;ve fallen into it firsthand — we&#39;d traded stage-based coupling for cognitive overload.&lt;/p&gt;
+&lt;h3&gt;Isolation at the pipeline level&lt;/h3&gt;
+&lt;p&gt;What we really want is the simplicity of stages but the isolation of our &amp;quot;needs&amp;quot; graph. With child pipelines, each service (or group of related services) gets its own isolated pipeline with its own stages. A failure in one child pipeline doesn&#39;t affect another.&lt;/p&gt;
+&lt;picture&gt;
+      &lt;source srcset=&quot;https://kwlch.dev/img/blog/gitlab/child-pipeline-dark.svg&quot; media=&quot;(prefers-color-scheme: dark)&quot; /&gt;
+      &lt;img src=&quot;https://kwlch.dev/img/blog/gitlab/child-pipeline-light.svg&quot; alt=&quot;The four services split into two child pipelines. Service A is in its own pipeline, outlined with a red dashed border — its test has failed and downstream jobs are blocked. Services B, C, and D are in a separate pipeline, outlined with a green dashed border — all their jobs have completed successfully through to production deployment, unaffected by service A&#39;s failure.&quot; /&gt;
+    &lt;/picture&gt;
+&lt;p&gt;Each child pipeline is small. No one needs to hold a large dependency graph in their head.&lt;/p&gt;
+&lt;p&gt;The parent pipeline&#39;s job is simple: trigger the relevant children based on which files changed. We push most jobs down to the children.&lt;/p&gt;
+&lt;p&gt;Yes, the UI is still frustrating — waiting for a child pipeline to trigger, not seeing stages inline. It&#39;d be nice if children loaded from the outset when the parent is created. GitLab has improved things, but it&#39;s still clunkier than I&#39;d like. It&#39;s an inconvenience, but the trade-off for isolation is 100% worth it.&lt;/p&gt;
+&lt;h2&gt;Stop nesting &lt;code&gt;extends&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;In the name of DRY code, some end up nesting extends several layers deep, obfuscating what a job is actually doing. You end up grepping across four files, trying to mentally merge YAML that was split apart to avoid repetition. And because extends let you override any field at any level, there&#39;s no way to constrain how someone uses a shared template. People override things they shouldn&#39;t, and the resulting behaviour is surprising.&lt;/p&gt;
+&lt;p&gt;I found a particularly incriminating example from a repo I&#39;ve worked on:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-yaml&quot;&gt;service_a_deploy_to_prod:
+  extends:
+    - .deploy_to_prod
+  environment:
+    name: service_a_prod
+  needs:
+    - service_a_build
+    - service_a_deploy_to_staging
+    - job: service_a_integration_test_staging
+      optional: true
+  variables:
+    DOMAIN: services/service_a
+    PROFILE: prod
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH &amp;amp;&amp;amp; $CI_DEPLOY_FREEZE == null
+      changes: !reference [.deploy_service_a_globs, changes]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;To understand this job, you need to read &lt;code&gt;.deploy_to_prod&lt;/code&gt; (itself a meaningless hop to add a level of indirection):&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-yaml&quot;&gt;.deploy_to_prod:
+  extends: .deploy_to_prod_base
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Which extends &lt;code&gt;.deploy_to_prod_base&lt;/code&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-yaml&quot;&gt;.deploy_to_prod_base:
+  extends: .deploy_k8s
+  stage: deploy_to_prod
+  environment:
+    name: prod
+  variables:
+    ENV: prod
+    CLOUD_ROLE_ARN: $CLOUD_ROLE_ARN_PROD
+    USE_VPN: &amp;quot;1&amp;quot;
+    VPN_ENV: prod
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Which extends &lt;code&gt;.deploy_k8s&lt;/code&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-yaml&quot;&gt;.deploy_k8s:
+  tags: !reference [.runner, tags]
+  image: $CI_REGISTRY_IMAGE/ci-deploy
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
+  before_script:
+    - !reference [.assume_cloud_role, before_script]
+    - !reference [.enable_vpn, before_script]
+    - if [[ $ENV == &amp;quot;default&amp;quot; ]]; then echo &amp;quot;Env not set&amp;quot;; exit 1; fi;
+    - make -C infrastructure/k8s update_kubeconfig/$ENV
+  script:
+    - REPO_ROOT=$(pwd)
+    - cd $DOMAIN
+    - ${REPO_ROOT}/ci/shared/apply.sh
+    - cd $REPO_ROOT
+  variables:
+    ENV: default
+    GIT_STRATEGY: clone
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;That&#39;s four files. Three levels of inheritance. Any field can be overridden at any level. Good luck reviewing a change to &lt;code&gt;.deploy_k8s&lt;/code&gt; and being confident about what it affects.&lt;/p&gt;
+&lt;h2&gt;Use CI/CD components instead&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;https://docs.gitlab.com/ci/components/&quot;&gt;CI/CD components&lt;/a&gt; solve this more cleanly. A component is a reusable pipeline unit with typed inputs. Instead of inheriting and overriding, you call it with parameters.&lt;/p&gt;
+&lt;p&gt;Here&#39;s the same deployment expressed as a component:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-yaml&quot;&gt;include:
+  - component: $CI_SERVER_FQDN/$CI_PROJECT_PATH/kubernetes-deploy@$CI_COMMIT_SHA
+    inputs:
+      domain: services/service_a
+      env: prod
+      profile: prod
+      cloud_role_arn: $CLOUD_ROLE_ARN_PROD
+      vpn_env: prod
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And the component itself:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-yaml&quot;&gt;# templates/kubernetes-deploy.yml
+spec:
+  inputs:
+    domain:
+      type: string
+    env:
+      type: string
+    profile:
+      type: string
+      default: &#39;&#39;
+    cloud_role_arn:
+      type: string
+    vpn_env:
+      type: string
+---
+deploy $[[ inputs.env ]] $[[ inputs.domain ]]:
+  tags: !reference [.runner, tags]
+  image: $CI_REGISTRY_IMAGE/ci-deploy
+  stage: deploy_$[[ inputs.env ]]
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
+  before_script:
+    - !reference [.assume_cloud_role, before_script]
+    - !reference [.enable_vpn, before_script]
+    - if [[ $ENV == &amp;quot;default&amp;quot; ]]; then echo &amp;quot;Env not set&amp;quot;; exit 1; fi;
+    - make -C infrastructure/k8s update_kubeconfig/$ENV
+  script:
+    - REPO_ROOT=$(pwd)
+    - cd $DOMAIN
+    - ${REPO_ROOT}/ci/shared/apply.sh
+    - cd $REPO_ROOT
+  variables:
+    ENV: $[[ inputs.env ]]
+    DOMAIN: $[[ inputs.domain ]]
+    PROFILE: $[[ inputs.profile ]]
+    CLOUD_ROLE_ARN: $[[ inputs.cloud_role_arn ]]
+    GIT_STRATEGY: clone
+    USE_VPN: &amp;quot;1&amp;quot;
+    VPN_ENV: $[[ inputs.vpn_env ]]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The consumer sees five named inputs. The component author controls what&#39;s exposed. Nobody is silently overriding &lt;code&gt;before_script&lt;/code&gt; three layers deep in a file you didn&#39;t know existed.&lt;/p&gt;
+&lt;p&gt;Components only went GA in GitLab 17.0, and they&#39;re still maturing. But they&#39;ve already proven to be a much more understandable way to share pipeline configuration than the &lt;code&gt;extends&lt;/code&gt; chains they replaced.&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;None of this is settled wisdom. GitLab keeps shipping changes and improvements — I&#39;m particularly excited to see where &lt;a href=&quot;https://docs.gitlab.com/ci/functions/&quot;&gt;Functions&lt;/a&gt; go.&lt;/p&gt;
+&lt;p&gt;If your monorepo has grown to the point where a failure in one service blocks another, or where understanding a single job means mentally reconstructing through a chain of extends clauses, these two changes should make a real difference.&lt;/p&gt;
+</content>
+  </entry>
+</feed>
