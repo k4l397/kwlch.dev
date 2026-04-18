@@ -1,4 +1,7 @@
-# Type-Safe Pagination in Python with Protocols
+---
+title: Type-Safe Pagination in Python with Protocols
+date: 2026-04-18
+---
 
 I wanted a generic pagination function for a GraphQL API, but the generated types wouldn't let me write one. I was using ariadne-codegen to generate typed Python stubs from a GraphQL schema — the types are correct, but you can't fully control their shape.
 
@@ -15,7 +18,7 @@ class EndpointASuccessItems:
 
 The challenge was that each error type was a distinct class with no common base class. Without a shared parent, there's no obvious way to write an `isinstance` check in a generic function that a type checker can use to narrow the type.
 
-This is the problem structural subtyping solves. Since Python 3.8, [Protocols](https://peps.python.org/pep-0544/) let you define a type by what it has, not what it inherits from. For me, having spent most time writing Go, this is a familiar concept very much akin to interfaces. 
+This is the problem structural subtyping solves. Since Python 3.8, [Protocols](https://peps.python.org/pep-0544/) let you define a type by what it has, not what it inherits from. For me, having spent most time writing Go, this is a familiar concept very much akin to interfaces.
 
 All the generated error types shared the same fields, but had no common parent:
 
