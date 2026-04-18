@@ -2,7 +2,7 @@
   "name": "kwlch.dev",
   "type": "module",
   "scripts": {
-    "build": "rm -rf _site/ && eleventy && parcel build _site/**/*.html && cp CNAME dist",
+    "build": "rm -rf _site/ && eleventy && parcel build _site/**/*.html && cp CNAME dist && cp _site/feed.xml dist/feed.xml",
     "start": "eleventy --serve",
     "deploy": "yarn build && ./deploy.sh"
   },
@@ -10,8 +10,8 @@
     "@11ty/eleventy": "3",
     "@11ty/eleventy-plugin-rss": "^3.0.0",
     "@11ty/eleventy-upgrade-help": "3",
-    "@parcel/core": "^2.13.0",
-    "parcel": "^2.13.0",
+    "@parcel/core": "^2.16.4",
+    "parcel": "^2.16.4",
     "prettier": "^3.3.3",
     "svgo": "^3.3.2"
   },
