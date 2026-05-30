@@ -1,0 +1,9 @@
+[settings]
+paranoid = true
+locked_verify_provenance = true
+lockfile = true
+
+[tools]
+node = "26.2.0"
+yarn = "4.15.0"
+"aqua:suzuki-shunsuke/pinact" = "4.0.0"
