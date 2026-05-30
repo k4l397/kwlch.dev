@@ -7,3 +7,7 @@ lockfile = true
 node = "26.2.0"
 yarn = "4.15.0"
 "aqua:suzuki-shunsuke/pinact" = "4.0.0"
+
+[tasks.pin-actions]
+run = "pinact run"
+description = "Pin all GitHub Actions to commit SHAs"
