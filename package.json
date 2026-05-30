@@ -6,15 +6,14 @@
     "start": "eleventy --serve"
   },
   "devDependencies": {
-    "@11ty/eleventy": "3",
+    "@11ty/eleventy": "3.1.5",
     "@11ty/eleventy-plugin-rss": "^3.0.0",
-    "@11ty/eleventy-upgrade-help": "3",
+    "@11ty/eleventy-upgrade-help": "3.0.2",
     "@parcel/core": "^2.16.4",
     "parcel": "^2.16.4",
-    "prettier": "^3.3.3",
-    "svgo": "^3.3.2"
+    "prettier": "^3.8.3"
   },
-  "packageManager": "yarn@4.5.1",
+  "packageManager": "yarn@4.15.0",
   "volta": {
     "node": "26.2.0"
   }
