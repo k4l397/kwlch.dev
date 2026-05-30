@@ -39,6 +39,31 @@ checksum = "sha256:800554b9f87c5136e9469ec9075a1f51fbea5ac402914d99f8afc4ec98a87
 url = "https://github.com/suzuki-shunsuke/pinact/releases/download/v4.0.0/pinact_windows_amd64.zip"
 provenance = "github-attestations"
 
+[[tools."aqua:yarnpkg/berry"]]
+version = "4.15.0"
+backend = "aqua:yarnpkg/berry"
+
+[tools."aqua:yarnpkg/berry"."platforms.linux-arm64"]
+url = "https://repo.yarnpkg.com/4.15.0/packages/yarnpkg-cli/bin/yarn.js"
+
+[tools."aqua:yarnpkg/berry"."platforms.linux-arm64-musl"]
+url = "https://repo.yarnpkg.com/4.15.0/packages/yarnpkg-cli/bin/yarn.js"
+
+[tools."aqua:yarnpkg/berry"."platforms.linux-x64"]
+url = "https://repo.yarnpkg.com/4.15.0/packages/yarnpkg-cli/bin/yarn.js"
+
+[tools."aqua:yarnpkg/berry"."platforms.linux-x64-musl"]
+url = "https://repo.yarnpkg.com/4.15.0/packages/yarnpkg-cli/bin/yarn.js"
+
+[tools."aqua:yarnpkg/berry"."platforms.macos-arm64"]
+url = "https://repo.yarnpkg.com/4.15.0/packages/yarnpkg-cli/bin/yarn.js"
+
+[tools."aqua:yarnpkg/berry"."platforms.macos-x64"]
+url = "https://repo.yarnpkg.com/4.15.0/packages/yarnpkg-cli/bin/yarn.js"
+
+[tools."aqua:yarnpkg/berry"."platforms.windows-x64"]
+url = "https://repo.yarnpkg.com/4.15.0/packages/yarnpkg-cli/bin/yarn.js"
+
 [[tools.node]]
 version = "26.2.0"
 backend = "core:node"
@@ -70,7 +95,3 @@ url = "https://nodejs.org/dist/v26.2.0/node-v26.2.0-darwin-x64.tar.gz"
 [tools.node."platforms.windows-x64"]
 checksum = "sha256:371071a4f7e2c8a5dd280730049c685911feecc59f50ebc488d675dc1087c69c"
 url = "https://nodejs.org/dist/v26.2.0/node-v26.2.0-win-x64.zip"
-
-[[tools.yarn]]
-version = "4.15.0"
-backend = "vfox:mise-plugins/vfox-yarn"
